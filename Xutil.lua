@@ -784,6 +784,18 @@ local exports = {
     XCNOMEM  = 1;    -- Out of memory
     XCNOENT  = 2;    -- No entry in table
 
+    -- library functions
+    XSetStandardProperties = Lib_X11.XSetStandardProperties;
 }
+
+setmetatable(exports, {
+    __call = function(self, ...)
+        for k,v in pairs(exports) do
+            _G[k] = v;
+        end
+
+        return self;
+    end,
+})
 
 return exports

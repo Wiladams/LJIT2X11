@@ -1,87 +1,34 @@
 --Xlib.lua
 
 local ffi = require("ffi")
+local bit = require("bit")
+local bor = bit.bor
+local bnot = bit.bnot
+local band = bit.band
 
--- The most primitive base types
--- can get some more from Xdefs.h if needed
-ffi.cdef[[
-typedef char *XPointer;
-typedef int Bool;
-typedef int Status;
-]]
+require("X")
 
 
-ffi.cdef[[
+local Lib_X11 = ffi.load("X11")
+local exports = {
+	Lib_X11 = Lib_X11;
+}
 
-typedef unsigned long XID;
-typedef unsigned long Mask;
-typedef unsigned long Atom;
+setmetatable(exports, {
+	__call = function(self, ...)
+		for k,v in pairs(exports) do
+			_G[k] = v;
+		end
 
-typedef unsigned long VisualID;
-typedef unsigned long Time;
-]]
+		return self;
+	end,
+})
 
--- Most useful handle types
-ffi.cdef[[
-typedef XID Window;
-typedef XID Drawable;
-typedef XID Font;
-typedef XID Pixmap;
-typedef XID Cursor;
-typedef XID Colormap;
-typedef XID GContext;
-typedef XID KeySym;
 
-typedef unsigned char KeyCode;
-]]
-
+exports.XlibSpecificationRelease = 6;
 
 
 --[[
-/*
-
-Copyright 1985, 1986, 1987, 1991, 1998  The Open Group
-
-Permission to use, copy, modify, distribute, and sell this software and its
-documentation for any purpose is hereby granted without fee, provided that
-the above copyright notice appear in all copies and that both that
-copyright notice and this permission notice appear in supporting
-documentation.
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
-OPEN GROUP BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-Except as contained in this notice, the name of The Open Group shall not be
-used in advertising or otherwise to promote the sale, use or other dealings
-in this Software without prior written authorization from The Open Group.
-
-*/
-
-
-/*
- *	Xlib.h - Header definition and support file for the C subroutine
- *	interface library (Xlib) to the X Window System Protocol (V11).
- *	Structures and symbols starting with "_" are private to the library.
- */
-#ifndef _X11_XLIB_H_
-#define _X11_XLIB_H_
-
-#define XlibSpecificationRelease 6
-
-#include <sys/types.h>
-
-#if defined(__SCO__) || defined(__UNIXWARE__)
-#include <stdint.h>
-#endif
-
-#include <X11/X.h>
 
 /* applications should not depend on these two headers being included! */
 #include <X11/Xfuncproto.h>
@@ -121,34 +68,34 @@ _Xmblen(
    November 2000. Its presence is indicated through the following macro. */
 #define X_HAVE_UTF8_STRING 1
 
-/* The Xlib structs are full of implicit padding to properly align members.
-   We can't clean that up without breaking ABI, so tell clang not to bother
-   complaining about it. */
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpadded"
-#endif
 
-typedef char *XPointer;
 
-#define Bool int
-#define Status int
+
+
 #define True 1
 #define False 0
+--]]
 
-#define QueuedAlready 0
-#define QueuedAfterReading 1
-#define QueuedAfterFlush 2
+exports.QueuedAlready = 0
+exports.QueuedAfterReading = 1
+exports.QueuedAfterFlush = 2
 
-#define ConnectionNumber(dpy) 	(((_XPrivDisplay)dpy)->fd)
-#define RootWindow(dpy, scr) 	(ScreenOfDisplay(dpy,scr)->root)
-#define DefaultScreen(dpy) 	(((_XPrivDisplay)dpy)->default_screen)
-#define DefaultRootWindow(dpy) 	(ScreenOfDisplay(dpy,DefaultScreen(dpy))->root)
-#define DefaultVisual(dpy, scr) (ScreenOfDisplay(dpy,scr)->root_visual)
-#define DefaultGC(dpy, scr) 	(ScreenOfDisplay(dpy,scr)->default_gc)
-#define BlackPixel(dpy, scr) 	(ScreenOfDisplay(dpy,scr)->black_pixel)
-#define WhitePixel(dpy, scr) 	(ScreenOfDisplay(dpy,scr)->white_pixel)
-#define AllPlanes 		((unsigned long)~0L)
+
+function exports.ConnectionNumber(dpy) 	return ffi.cast("_XPrivDisplay",dpy).fd end
+function exports.RootWindow(dpy, scr) 	return (ScreenOfDisplay(dpy,scr).root) end
+
+
+function exports.DefaultScreen(dpy) 	return ffi.cast("_XPrivDisplay", dpy).default_screen end
+function exports.DefaultRootWindow(dpy) 	return ScreenOfDisplay(dpy,DefaultScreen(dpy)).root end
+function exports.DefaultVisual(dpy, scr) return ScreenOfDisplay(dpy,scr).root_visual end
+function exports.DefaultGC(dpy, scr) 	return ScreenOfDisplay(dpy,scr).default_gc end
+function exports.BlackPixel(dpy, scr) 	return ScreenOfDisplay(dpy,scr).black_pixel end
+function exports.WhitePixel(dpy, scr) 	return ScreenOfDisplay(dpy,scr).white_pixel end
+
+
+exports.AllPlanes = bnot(0);		-- ((unsigned long)~0L)
+
+--[[
 #define QLength(dpy) 		(((_XPrivDisplay)dpy)->qlen)
 #define DisplayWidth(dpy, scr) 	(ScreenOfDisplay(dpy,scr)->width)
 #define DisplayHeight(dpy, scr) (ScreenOfDisplay(dpy,scr)->height)
@@ -170,9 +117,13 @@ typedef char *XPointer;
 #define ImageByteOrder(dpy) 	(((_XPrivDisplay)dpy)->byte_order)
 #define NextRequest(dpy)	(((_XPrivDisplay)dpy)->request + 1)
 #define LastKnownRequestProcessed(dpy)	(((_XPrivDisplay)dpy)->last_request_read)
+--]]
 
-/* macros for screen oriented applications (toolkit) */
-#define ScreenOfDisplay(dpy, scr)(&((_XPrivDisplay)dpy)->screens[scr])
+
+-- macros for screen oriented applications (toolkit)
+function exports.ScreenOfDisplay(dpy, scr) return ffi.cast("_XPrivDisplay",dpy).screens[scr];  end
+
+--[[
 #define DefaultScreenOfDisplay(dpy) ScreenOfDisplay(dpy,DefaultScreen(dpy))
 #define DisplayOfScreen(s)	((s)->display)
 #define RootWindowOfScreen(s)	((s)->root)
@@ -194,6 +145,7 @@ typedef char *XPointer;
 #define DoesBackingStore(s)	((s)->backing_store)
 #define EventMaskOfScreen(s)	((s)->root_input_mask)
 --]]
+
 
 ffi.cdef[[
 /*
@@ -365,7 +317,7 @@ typedef struct {
 } XSetWindowAttributes;
 ]]
 
---[[
+ffi.cdef[[
 typedef struct {
     int x, y;			/* location of window */
     int width, height;		/* width and height of window */
@@ -373,11 +325,7 @@ typedef struct {
     int depth;          	/* depth of window */
     Visual *visual;		/* the associated visual structure */
     Window root;        	/* root of screen containing window */
-#if defined(__cplusplus) || defined(c_plusplus)
-    int c_class;		/* C++ InputOutput, InputOnly*/
-#else
     int class;			/* InputOutput, InputOnly*/
-#endif
     int bit_gravity;		/* one of bit gravity values */
     int win_gravity;		/* one of the window gravity values */
     int backing_store;		/* NotUseful, WhenMapped, Always */
@@ -393,7 +341,9 @@ typedef struct {
     Bool override_redirect;	/* boolean value for override-redirect */
     Screen *screen;		/* back pointer to correct screen */
 } XWindowAttributes;
+]]
 
+ffi.cdef[[
 /*
  * Data structure for host setting; getting routines.
  *
@@ -404,7 +354,9 @@ typedef struct {
 	int length;		/* length of address, in bytes */
 	char *address;		/* pointer to where to find the bytes */
 } XHostAddress;
+]]
 
+ffi.cdef[[
 /*
  * Data structure for ServerFamilyInterpreted addresses in host routines
  */
@@ -414,7 +366,9 @@ typedef struct {
 	char *type;		/* pointer to where to find the type string */
 	char *value;		/* pointer to where to find the address */
 } XServerInterpretedAddress;
+]]
 
+ffi.cdef[[
 /*
  * Data structure for "image" data, used by image manipulation routines.
  */
@@ -453,7 +407,7 @@ typedef struct _XImage {
 	int (*add_pixel)            (struct _XImage *, long);
 	} f;
 } XImage;
---]]
+]]
 
 ffi.cdef[[
 /*
@@ -563,9 +517,6 @@ struct _XPrivate;		/* Forward declare before use for C++ */
 struct _XrmHashBucketRec;
 
 typedef struct
-//#ifdef XLIB_ILLEGAL_ACCESS
-//_XDisplay
-//#endif
 {
 	XExtData *ext_data;	/* hook for extension to hang data */
 	struct _XPrivate *private1;
@@ -615,11 +566,7 @@ typedef struct
 	int private19;
 	char *xdefaults;	/* contents of defaults from server */
 	/* there is more to this structure, but it is private to Xlib */
-}
-//#ifdef XLIB_ILLEGAL_ACCESS
-//Display,
-//#endif
-*_XPrivDisplay;
+} *_XPrivDisplay;
 ]]
 
 ffi.cdef[[
@@ -1043,7 +990,7 @@ typedef struct {
 } XAnyEvent;
 ]]
 
---[[
+ffi.cdef[[
 /***************************************************************
  *
  * GenericEvent.  This event is the standard event for all newer extensions.
@@ -1069,7 +1016,9 @@ typedef struct {
     unsigned int   cookie;
     void           *data;
 } XGenericEventCookie;
+]]
 
+ffi.cdef[[
 /*
  * this union is defined so Xlib can always use the same sized
  * event structure internally, to avoid memory fragmentation.
@@ -1111,10 +1060,14 @@ typedef union _XEvent {
 	XGenericEventCookie xcookie;
 	long pad[24];
 } XEvent;
-#endif
+]]
 
-#define XAllocID(dpy) ((*((_XPrivDisplay)dpy)->resource_alloc)((dpy)))
+local function  XAllocID(dpy) 
+	--return ((*((_XPrivDisplay)dpy)->resource_alloc)((dpy)))
+end
 
+
+ffi.cdef[[
 /*
  * per character font metric information.
  */
@@ -1126,7 +1079,9 @@ typedef struct {
     short	descent;	/* baseline to bottom edge of raster */
     unsigned short attributes;	/* per char flags (not predefined) */
 } XCharStruct;
+]]
 
+ffi.cdef[[
 /*
  * To allow arbitrary information with fonts, there are additional properties
  * returned.
@@ -1154,7 +1109,9 @@ typedef struct {
     int		ascent;		/* log. extent above baseline for spacing */
     int		descent;	/* log. descent below baseline for spacing */
 } XFontStruct;
+]]
 
+ffi.cdef[[
 /*
  * PolyText routines take these as arguments.
  */
@@ -1189,11 +1146,10 @@ typedef struct {
     XRectangle      max_ink_extent;
     XRectangle      max_logical_extent;
 } XFontSetExtents;
+]]
 
-/* unused:
-typedef void (*XOMProc)();
- */
 
+ffi.cdef[[
 typedef struct _XOM *XOM;
 typedef struct _XOC *XOC, *XFontSet;
 
@@ -1210,7 +1166,9 @@ typedef struct {
     int             delta;
     XFontSet        font_set;
 } XwcTextItem;
+]]
 
+--[[
 #define XNRequiredCharSet "requiredCharSet"
 #define XNQueryOrientation "queryOrientation"
 #define XNBaseFontName "baseFontName"
@@ -1273,7 +1231,9 @@ typedef struct {
     unsigned short count_styles;
     XIMStyle *supported_styles;
 } XIMStyles;
+--]]
 
+--[[
 #define XIMPreeditArea		0x0001L
 #define XIMPreeditCallbacks	0x0002L
 #define XIMPreeditPosition	0x0004L
@@ -1327,7 +1287,9 @@ typedef struct {
 #define XNHotKeyState "hotKeyState"
 #define XNPreeditState "preeditState"
 #define XNSeparatorofNestedList "separatorofNestedList"
+--]]
 
+--[[
 #define XBufferOverflow		-1
 #define XLookupNone		1
 #define XLookupChars		2
@@ -1580,7 +1542,9 @@ extern XImage *XGetSubImage(
     int			/* dest_x */,
     int			/* dest_y */
 );
+--]]
 
+ffi.cdef[[
 /*
  * X function declarations.
  */
@@ -1787,20 +1751,17 @@ extern XHostAddress *XListHosts(
     int*		/* nhosts_return */,
     Bool*		/* state_return */
 );
-_X_DEPRECATED
-extern KeySym XKeycodeToKeysym(
-    Display*		/* display */,
-#if NeedWidePrototypes
-    unsigned int	/* keycode */,
-#else
-    KeyCode		/* keycode */,
-#endif
-    int			/* index */
-);
+]]
+
+
+ffi.cdef[[
 extern KeySym XLookupKeysym(
     XKeyEvent*		/* key_event */,
     int			/* index */
 );
+]]
+
+--[[
 extern KeySym *XGetKeyboardMapping(
     Display*		/* display */,
 #if NeedWidePrototypes
@@ -1811,6 +1772,9 @@ extern KeySym *XGetKeyboardMapping(
     int			/* keycode_count */,
     int*		/* keysyms_per_keycode_return */
 );
+--]]
+
+ffi.cdef[[
 extern KeySym XStringToKeysym(
     const char*	/* string */
 );
@@ -2031,7 +1995,9 @@ extern int XSetTransientForHint(
     Window		/* w */,
     Window		/* prop_window */
 );
+]]
 
+ffi.cdef[[
 /* The following are given in alphabetical order */
 
 extern int XActivateScreenSaver(
@@ -2110,7 +2076,9 @@ extern int XAutoRepeatOff(
 extern int XAutoRepeatOn(
     Display*		/* display */
 );
+]]
 
+ffi.cdef[[
 extern int XBell(
     Display*		/* display */,
     int			/* percent */
@@ -2127,7 +2095,9 @@ extern int XBitmapPad(
 extern int XBitmapUnit(
     Display*		/* display */
 );
+]]
 
+ffi.cdef[[
 extern int XCellsOfScreen(
     Screen*		/* screen */
 );
@@ -2318,7 +2288,9 @@ extern int XCopyPlane(
     int			/* dest_y */,
     unsigned long	/* plane */
 );
+]]
 
+ffi.cdef[[
 extern int XDefaultDepth(
     Display*		/* display */,
     int			/* screen_number */
@@ -2544,7 +2516,9 @@ extern int XDrawText16(
     XTextItem16*	/* items */,
     int			/* nitems */
 );
+]]
 
+ffi.cdef[[
 extern int XEnableAccessControl(
     Display*		/* display */
 );
@@ -2553,7 +2527,9 @@ extern int XEventsQueued(
     Display*		/* display */,
     int			/* mode */
 );
+]]
 
+ffi.cdef[[
 extern Status XFetchName(
     Display*		/* display */,
     Window		/* w */,
@@ -2675,7 +2651,9 @@ extern int XFreePixmap(
     Display*		/* display */,
     Pixmap		/* pixmap */
 );
+]]
 
+ffi.cdef[[
 extern int XGeometry(
     Display*		/* display */,
     int			/* screen */,
@@ -2845,7 +2823,9 @@ extern int XGrabPointer(
 extern int XGrabServer(
     Display*		/* display */
 );
+]]
 
+ffi.cdef[[
 extern int XHeightMMOfScreen(
     Screen*		/* screen */
 );
@@ -2853,7 +2833,9 @@ extern int XHeightMMOfScreen(
 extern int XHeightOfScreen(
     Screen*		/* screen */
 );
+]]
 
+ffi.cdef[[
 extern int XIfEvent(
     Display*		/* display */,
     XEvent*		/* event_return */,
@@ -2873,7 +2855,9 @@ extern int XInstallColormap(
     Display*		/* display */,
     Colormap		/* colormap */
 );
+]]
 
+ffi.cdef[[
 extern KeyCode XKeysymToKeycode(
     Display*		/* display */,
     KeySym		/* keysym */
@@ -2883,7 +2867,9 @@ extern int XKillClient(
     Display*		/* display */,
     XID			/* resource */
 );
+]]
 
+ffi.cdef[[
 extern Status XLookupColor(
     Display*		/* display */,
     Colormap		/* colormap */,
@@ -2896,7 +2882,9 @@ extern int XLowerWindow(
     Display*		/* display */,
     Window		/* w */
 );
+]]
 
+ffi.cdef[[
 extern int XMapRaised(
     Display*		/* display */,
     Window		/* w */
@@ -2941,7 +2929,9 @@ extern int XMoveWindow(
     int			/* x */,
     int			/* y */
 );
+]]
 
+ffi.cdef[[
 extern int XNextEvent(
     Display*		/* display */,
     XEvent*		/* event_return */
@@ -2950,7 +2940,9 @@ extern int XNextEvent(
 extern int XNoOp(
     Display*		/* display */
 );
+]]
 
+ffi.cdef[[
 extern Status XParseColor(
     Display*		/* display */,
     Colormap		/* colormap */,
@@ -3016,7 +3008,9 @@ extern int XPutImage(
     unsigned int	/* width */,
     unsigned int	/* height */
 );
+]]
 
+ffi.cdef[[
 extern int XQLength(
     Display*		/* display */
 );
@@ -3126,7 +3120,9 @@ extern Status XQueryTree(
     Window**		/* children_return */,
     unsigned int*	/* nchildren_return */
 );
+]]
 
+ffi.cdef[[
 extern int XRaiseWindow(
     Display*		/* display */,
     Window		/* w */
@@ -3225,7 +3221,9 @@ extern int XRotateWindowProperties(
     int			/* num_prop */,
     int			/* npositions */
 );
+]]
 
+ffi.cdef[[
 extern int XScreenCount(
     Display*		/* display */
 );
@@ -3514,7 +3512,9 @@ extern int XSync(
     Display*		/* display */,
     Bool		/* discard */
 );
+]]
 
+ffi.cdef[[
 extern int XTextExtents(
     XFontStruct*	/* font_struct */,
     const char*	/* string */,
@@ -3557,7 +3557,9 @@ extern Bool XTranslateCoordinates(
     int*		/* dest_y_return */,
     Window*		/* child_return */
 );
+]]
 
+ffi.cdef[[
 extern int XUndefineCursor(
     Display*		/* display */,
     Window		/* w */
@@ -3610,11 +3612,15 @@ extern int XUnmapWindow(
     Display*		/* display */,
     Window		/* w */
 );
+]]
 
+ffi.cdef[[
 extern int XVendorRelease(
     Display*		/* display */
 );
+]]
 
+ffi.cdef[[
 extern int XWarpPointer(
     Display*		/* display */,
     Window		/* src_w */,
@@ -3651,13 +3657,17 @@ extern int XWriteBitmapFile(
     int			/* x_hot */,
     int			/* y_hot */
 );
+]]
 
+ffi.cdef[[
 extern Bool XSupportsLocale (void);
 
 extern char *XSetLocaleModifiers(
     const char*		/* modifier_list */
 );
+]]
 
+--[[
 extern XOM XOpenOM(
     Display*			/* display */,
     struct _XrmHashBucketRec*	/* rdb */,
@@ -3709,7 +3719,9 @@ extern char *XGetOCValues(
     XOC			/* oc */,
     ...
 ) _X_SENTINEL(0);
+--]]
 
+ffi.cdef[[
 extern XFontSet XCreateFontSet(
     Display*		/* display */,
     const char*	/* base_font_name_list */,
@@ -3830,7 +3842,9 @@ extern Status Xutf8TextPerCharExtents(
     XRectangle*		/* overall_ink_return */,
     XRectangle*		/* overall_logical_return */
 );
+]]
 
+ffi.cdef[[
 extern void XmbDrawText(
     Display*		/* display */,
     Drawable		/* d */,
@@ -3926,7 +3940,9 @@ extern void Xutf8DrawImageString(
     const char*	/* text */,
     int			/* bytes_text */
 );
+]]
 
+--[[
 extern XIM XOpenIM(
     Display*			/* dpy */,
     struct _XrmHashBucketRec*	/* rdb */,
@@ -4104,7 +4120,9 @@ extern int _Xwctomb(
     char *			/* str */,
     wchar_t			/* wc */
 );
+--]]
 
+ffi.cdef[[
 extern Bool XGetEventData(
     Display*			/* dpy */,
     XGenericEventCookie*	/* cookie*/
@@ -4114,14 +4132,23 @@ extern void XFreeEventData(
     Display*			/* dpy */,
     XGenericEventCookie*	/* cookie*/
 );
+]]
 
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+-- Library functions
+exports.XOpenDisplay = Lib_X11.XOpenDisplay;
+exports.XClearWindow = Lib_X11.XClearWindow;
+exports.XCloseDisplay = Lib_X11.XCloseDisplay;
+exports.XCreateGC = Lib_X11.XCreateGC;
+exports.XCreateSimpleWindow = Lib_X11.XCreateSimpleWindow;
+exports.XDestroyWindow = Lib_X11.XDestroyWindow;
+exports.XDrawString = Lib_X11.XDrawString;
+exports.XFreeGC = Lib_X11.XFreeGC;
+exports.XMapRaised = Lib_X11.XMapRaised;
+exports.XNextEvent = Lib_X11.XNextEvent;
+exports.XSelectInput = Lib_X11.XSelectInput;
+exports.XSetBackground = Lib_X11.XSetBackground;
+exports.XSetForeground = Lib_X11.XSetForeground;
 
-_XFUNCPROTOEND
-
-#endif /* _X11_XLIB_H_ */
 
 
---]]
+return exports
