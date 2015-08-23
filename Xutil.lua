@@ -785,6 +785,7 @@ local exports = {
     XCNOENT  = 2;    -- No entry in table
 
     -- library functions
+    XLookupString = Lib_X11.XLookupString;
     XSetStandardProperties = Lib_X11.XSetStandardProperties;
 }
 

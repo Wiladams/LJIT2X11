@@ -1586,7 +1586,9 @@ extern char *XDisplayName(
 extern char *XKeysymToString(
     KeySym		/* keysym */
 );
+]]
 
+ffi.cdef[[
 extern int (*XSynchronize(
     Display*		/* display */,
     Bool		/* onoff */
@@ -1601,6 +1603,9 @@ extern int (*XSetAfterFunction(
 ))(
     Display*		/* display */
 );
+]]
+
+ffi.cdef[[
 extern Atom XInternAtom(
     Display*		/* display */,
     const char*	/* atom_name */,
@@ -4143,12 +4148,16 @@ exports.XCreateSimpleWindow = Lib_X11.XCreateSimpleWindow;
 exports.XDestroyWindow = Lib_X11.XDestroyWindow;
 exports.XDrawString = Lib_X11.XDrawString;
 exports.XFreeGC = Lib_X11.XFreeGC;
+exports.XGetWindowAttributes = Lib_X11.XGetWindowAttributes;
+exports.XInternAtom = Lib_X11.XInternAtom;
 exports.XMapRaised = Lib_X11.XMapRaised;
+exports.XMapWindow = Lib_X11.XMapWindow;
 exports.XNextEvent = Lib_X11.XNextEvent;
 exports.XSelectInput = Lib_X11.XSelectInput;
 exports.XSetBackground = Lib_X11.XSetBackground;
 exports.XSetForeground = Lib_X11.XSetForeground;
-
+exports.XSetWMProtocols = Lib_X11.XSetWMProtocols;
+exports.XStoreName = Lib_X11.XStoreName;
 
 
 return exports
