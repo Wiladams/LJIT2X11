@@ -1,7 +1,7 @@
 --[[
 	A simple example of a minimal X11 program
 --]]
-package.path = package.path..";../?.lua"
+package.path = package.path..";../src/?.lua"
 
 local ffi = require("ffi")
 local bit = require("bit")
