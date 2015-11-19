@@ -2,9 +2,9 @@
 
 local ffi = require("ffi")
 
-local X = require("X")
-local Xlib = require("Xlib")
-local Xutil = require("Xutil")
+local X = require("x11.X")
+local Xlib = require("x11.Xlib")
+local Xutil = require("x11.Xutil")
 --Xos = require("Xos")
 
 local Lib_X11 = ffi.load("X11")

@@ -1,7 +1,7 @@
 
 local ffi = require("ffi")
 
-local Xlib = require("Xlib")
+local Xlib = require("x11.Xlib")
 
 ffi.cdef[[
 /*
@@ -117,8 +117,7 @@ typedef struct {
 } XClassHint;
 ]]
 
---[[
-#ifdef XUTIL_DEFINE_FUNCTIONS
+ffi.cdef[[
 extern int XDestroyImage(
         XImage *ximage);
 extern unsigned long XGetPixel(
@@ -135,7 +134,9 @@ extern XImage *XSubImage(
 extern int XAddPixel(
         XImage *ximage,
         long value);
-#else
+]]
+
+--[[
 /*
  * These macros are used to give some sugar to the image routines so that
  * naive people are more comfortable with them.
@@ -786,6 +787,7 @@ local exports = {
 
     -- library functions
     XLookupString = Lib_X11.XLookupString;
+    XPutPixel = Lib_X11.XPutPixel;
     XSetStandardProperties = Lib_X11.XSetStandardProperties;
 }
 

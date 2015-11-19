@@ -7,7 +7,6 @@ local band = bit.band
 
 local X11 = require("X11")()
      
---    #include <sys/utsname.h>
 ffi.cdef[[
 static const int __NEW_UTS_LEN = 64;
 

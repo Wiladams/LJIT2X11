@@ -6,7 +6,7 @@ local bor = bit.bor
 local bnot = bit.bnot
 local band = bit.band
 
-require("X")
+require("x11.X")
 
 
 local Lib_X11 = ffi.load("X11")
@@ -1503,7 +1503,9 @@ extern XModifierKeymap	*XInsertModifiermapEntry(
 extern XModifierKeymap *XNewModifiermap(
     int			/* max_keys_per_mod */
 );
+--]]
 
+ffi.cdef[[
 extern XImage *XCreateImage(
     Display*		/* display */,
     Visual*		/* visual */,
@@ -1542,7 +1544,7 @@ extern XImage *XGetSubImage(
     int			/* dest_x */,
     int			/* dest_y */
 );
---]]
+]]
 
 ffi.cdef[[
 /*
@@ -4120,12 +4122,14 @@ extern int _Xmbtowc(
     int				/* len */
 #endif
 );
+--]]
 
+ffi.cdef[[
 extern int _Xwctomb(
     char *			/* str */,
     wchar_t			/* wc */
 );
---]]
+]]
 
 ffi.cdef[[
 extern Bool XGetEventData(
@@ -4144,7 +4148,10 @@ exports.XOpenDisplay = Lib_X11.XOpenDisplay;
 exports.XClearWindow = Lib_X11.XClearWindow;
 exports.XCloseDisplay = Lib_X11.XCloseDisplay;
 exports.XCreateGC = Lib_X11.XCreateGC;
+exports.XCreateImage = Lib_X11.XCreateImage;
+exports.XInitImage = Lib_X11.XInitImage;
 exports.XCreateSimpleWindow = Lib_X11.XCreateSimpleWindow;
+exports.XDefaultVisual = Lib_X11.XDefaultVisual;
 exports.XDestroyWindow = Lib_X11.XDestroyWindow;
 exports.XDrawString = Lib_X11.XDrawString;
 exports.XFreeGC = Lib_X11.XFreeGC;
@@ -4153,6 +4160,7 @@ exports.XInternAtom = Lib_X11.XInternAtom;
 exports.XMapRaised = Lib_X11.XMapRaised;
 exports.XMapWindow = Lib_X11.XMapWindow;
 exports.XNextEvent = Lib_X11.XNextEvent;
+exports.XPutImage = Lib_X11.XPutImage;
 exports.XSelectInput = Lib_X11.XSelectInput;
 exports.XSetBackground = Lib_X11.XSetBackground;
 exports.XSetForeground = Lib_X11.XSetForeground;
