@@ -532,27 +532,33 @@ exports.LASTEvent		= 36	-- must be bigger than any event #
 #define GCArcMode		(1L<<22)
 
 #define GCLastBit		22
+]]
+
+ffi.cdef[[
 /*****************************************************************
  * FONTS 
  *****************************************************************/
 
 /* used in QueryFont -- draw direction */
+static const int FontLeftToRight	=	0;
+static const int FontRightToLeft	=	1;
 
-#define FontLeftToRight		0
-#define FontRightToLeft		1
+static const int FontChange		=255;
+]]
 
-#define FontChange		255
-
+ffi.cdef[[
 /*****************************************************************
  *  IMAGING 
  *****************************************************************/
 
 /* ImageFormat -- PutImage, GetImage */
 
-#define XYBitmap		0	/* depth 1, XYFormat */
-#define XYPixmap		1	/* depth == drawable depth */
-#define ZPixmap			2	/* depth == drawable depth */
+static const int XYBitmap		= 0;	/* depth 1, XYFormat */
+static const int XYPixmap		= 1;	/* depth == drawable depth */
+static const int ZPixmap		= 2;	/* depth == drawable depth */
+]]
 
+--[[
 /*****************************************************************
  *  COLOR MAP STUFF 
  *****************************************************************/
@@ -608,58 +614,64 @@ exports.LASTEvent		= 36	-- must be bigger than any event #
 #define MappingModifier		0
 #define MappingKeyboard		1
 #define MappingPointer		2
+--]]
 
+ffi.cdef[[
 /*****************************************************************
  * SCREEN SAVER STUFF 
  *****************************************************************/
 
-#define DontPreferBlanking	0
-#define PreferBlanking		1
-#define DefaultBlanking		2
+static const int DontPreferBlanking	= 0;
+static const int PreferBlanking		= 1;
+static const int DefaultBlanking		= 2;
 
-#define DisableScreenSaver	0
-#define DisableScreenInterval	0
+static const int DisableScreenSaver	= 0;
+static const int DisableScreenInterval	= 0;
 
-#define DontAllowExposures	0
-#define AllowExposures		1
-#define DefaultExposures	2
+static const int DontAllowExposures	= 0;
+static const int AllowExposures		= 1;
+static const int DefaultExposures	= 2;
 
 /* for ForceScreenSaver */
 
-#define ScreenSaverReset 0
-#define ScreenSaverActive 1
+static const int ScreenSaverReset = 0;
+static const int ScreenSaverActive = 1;
+]]
 
+ffi.cdef[[
 /*****************************************************************
  * HOSTS AND CONNECTIONS
  *****************************************************************/
 
 /* for ChangeHosts */
 
-#define HostInsert		0
-#define HostDelete		1
+static const int HostInsert		= 0;
+static const int HostDelete		= 1;
 
 /* for ChangeAccessControl */
 
-#define EnableAccess		1      
-#define DisableAccess		0
+static const int EnableAccess		= 1;      
+static const int DisableAccess		= 0;
+]]
 
+ffi.cdef[[
 /* Display classes  used in opening the connection 
  * Note that the statically allocated ones are even numbered and the
  * dynamically changeable ones are odd numbered */
 
-#define StaticGray		0
-#define GrayScale		1
-#define StaticColor		2
-#define PseudoColor		3
-#define TrueColor		4
-#define DirectColor		5
+static const int StaticGray		= 0;
+static const int GrayScale		= 1;
+static const int StaticColor		= 2;
+static const int PseudoColor		= 3;
+static const int TrueColor		= 4;
+static const int DirectColor		= 5;
 
 
 /* Byte order  used in imageByteOrder and bitmapBitOrder */
 
-#define LSBFirst		0
-#define MSBFirst		1
---]]
+static const int LSBFirst		= 0;
+static const int MSBFirst		= 1;
+]]
 
 
 return exports

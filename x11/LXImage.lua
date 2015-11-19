@@ -3,41 +3,6 @@ local Xutil = require("x11.Xutil")
 local Xlib = require("x11.Xlib")
 
 
---[[
-extern int XDestroyImage(
-        XImage *ximage);
-extern unsigned long XGetPixel(
-        XImage *ximage,
-        int x, int y);
-extern int XPutPixel(
-        XImage *ximage,
-        int x, int y,
-        unsigned long pixel);
-extern XImage *XSubImage(
-        XImage *ximage,
-        int x, int y,
-        unsigned int width, unsigned int height);
-extern int XAddPixel(
-        XImage *ximage,
-        long value);
-
-extern XImage *XCreateImage(
-    Display*		/* display */,
-    Visual*		/* visual */,
-    unsigned int	/* depth */,
-    int			/* format */,
-    int			/* offset */,
-    char*		/* data */,
-    unsigned int	/* width */,
-    unsigned int	/* height */,
-    int			/* bitmap_pad */,
-    int			/* bytes_per_line */
-);
-extern Status XInitImage(
-    XImage*		/* image */
-);
---]]
-
 local LXImage = {}
 setmetatable(LXImage, {
 	__call = function(self, ...)
@@ -60,7 +25,11 @@ end
 function LXImage.new(self, width, height, depth, data, display, visual, format, offset, bitmap_pad, bytes_per_line)
 	bytes_per_line = bytes_per_line or 0
 
-	local img = Xlib.XCreateImage(display, visual, depth, format, offset, data, width, height, bitmap_pad, bytes_per_line)
+	local img = Xlib.XCreateImage(display, visual, depth, format, offset, 
+		ffi.cast("char *",data), 
+		width, height, 
+		bitmap_pad, 
+		bytes_per_line)
 	
 	if img == nil then
 		return nil;

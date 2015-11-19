@@ -1179,7 +1179,9 @@ typedef struct {
 #define XNDirectionalDependentDrawing "directionalDependentDrawing"
 #define XNContextualDrawing "contextualDrawing"
 #define XNFontInfo "fontInfo"
+--]]
 
+ffi.cdef[[
 typedef struct {
     int charset_count;
     char **charset_list;
@@ -1231,7 +1233,7 @@ typedef struct {
     unsigned short count_styles;
     XIMStyle *supported_styles;
 } XIMStyles;
---]]
+]]
 
 --[[
 #define XIMPreeditArea		0x0001L
@@ -4052,7 +4054,9 @@ extern int Xutf8LookupString(
 extern XVaNestedList XVaCreateNestedList(
     int /*unused*/, ...
 ) _X_SENTINEL(0);
+--]]
 
+ffi.cdef[[
 /* internal connections for IMs */
 
 extern Bool XRegisterIMInstantiateCallback(
@@ -4072,7 +4076,9 @@ extern Bool XUnregisterIMInstantiateCallback(
     XIDProc			/* callback */,
     XPointer			/* client_data */
 );
+]]
 
+ffi.cdef[[
 typedef void (*XConnectionWatchProc)(
     Display*			/* dpy */,
     XPointer			/* client_data */,
@@ -4080,8 +4086,9 @@ typedef void (*XConnectionWatchProc)(
     Bool			/* opening */,	 /* open or close flag */
     XPointer*			/* watch_data */ /* open sets, close uses */
 );
+]]
 
-
+ffi.cdef[[
 extern Status XInternalConnectionNumbers(
     Display*			/* dpy */,
     int**			/* fd_return */,
@@ -4111,7 +4118,9 @@ extern void XSetAuthorization(
     char *			/* data */,
     int				/* datalen */
 );
+]]
 
+--[[
 extern int _Xmbtowc(
     wchar_t *			/* wstr */,
 #ifdef ISC
@@ -4145,6 +4154,7 @@ extern void XFreeEventData(
 
 -- Library functions
 exports.XOpenDisplay = Lib_X11.XOpenDisplay;
+exports.XCheckWindowEvent = Lib_X11.XCheckWindowEvent;
 exports.XClearWindow = Lib_X11.XClearWindow;
 exports.XCloseDisplay = Lib_X11.XCloseDisplay;
 exports.XCreateGC = Lib_X11.XCreateGC;
