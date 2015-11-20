@@ -118,61 +118,66 @@ exports.PropertyChangeMask		= lshift(1, 22)
 exports.ColormapChangeMask		= lshift(1, 23) 
 exports.OwnerGrabButtonMask		= lshift(1, 24) 
 
---[[
+
+
+ffi.cdef[[
+
 /* Event names.  Used in "type" field in XEvent structures.  Not to be
 confused with event masks above.  They start from 2 because 0 and 1
 are reserved in the protocol for errors and replies. */
---]]
 
-exports.KeyPress		=2
-exports.KeyRelease		=3
-exports.ButtonPress		=4
-exports.ButtonRelease	=	5
-exports.MotionNotify	=	6
-exports.EnterNotify		=7
-exports.LeaveNotify		=8
-exports.FocusIn			=9
-exports.FocusOut		=10
-exports.KeymapNotify	=	11
-exports.Expose			=12
-exports.GraphicsExpose	=	13
-exports.NoExpose		=14
-exports.VisibilityNotify=	15
-exports.CreateNotify	=	16
-exports.DestroyNotify	=	17
-exports.UnmapNotify		=18
-exports.MapNotify		=19
-exports.MapRequest		=20
-exports.ReparentNotify	=	21
-exports.ConfigureNotify	=	22
-exports.ConfigureRequest=	23
-exports.GravityNotify	=	24
-exports.ResizeRequest	=	25
-exports.CirculateNotify	=	26
-exports.CirculateRequest=	27
-exports.PropertyNotify	=	28
-exports.SelectionClear	=	29
-exports.SelectionRequest=	30
-exports.SelectionNotify	=	31
-exports.ColormapNotify	=	32
-exports.ClientMessage	=	33
-exports.MappingNotify	=	34
-exports.GenericEvent	=	35
-exports.LASTEvent		= 36	-- must be bigger than any event #
+static const int KeyPress		=2;
+static const int KeyRelease		=3;
+static const int ButtonPress		=4;
+static const int ButtonRelease	=	5;
+static const int MotionNotify	=	6;
+static const int EnterNotify		=7;
+static const int LeaveNotify		=8;
+static const int FocusIn			=9;
+static const int FocusOut		=10;
+static const int KeymapNotify	=	11;
+static const int Expose			=12;
+static const int GraphicsExpose	=	13;
+static const int NoExpose		=14;
+static const int VisibilityNotify=	15;
+static const int CreateNotify	=	16;
+static const int DestroyNotify	=	17;
+static const int UnmapNotify		=18;
+static const int MapNotify		=19;
+static const int MapRequest		=20;
+static const int ReparentNotify	=	21;
+static const int ConfigureNotify	=	22;
+static const int ConfigureRequest=	23;
+static const int GravityNotify	=	24;
+static const int ResizeRequest	=	25;
+static const int CirculateNotify	=	26;
+static const int CirculateRequest=	27;
+static const int PropertyNotify	=	28;
+static const int SelectionClear	=	29;
+static const int SelectionRequest=	30;
+static const int SelectionNotify	=	31;
+static const int ColormapNotify	=	32;
+static const int ClientMessage	=	33;
+static const int MappingNotify	=	34;
+static const int GenericEvent	=	35;
+static const int LASTEvent		= 36;	// must be bigger than any event #
+]]
 
---[[
+ffi.cdef[[
 /* Key masks. Used as modifiers to GrabButton and GrabKey, results of QueryPointer,
    state in various key-, mouse-, and button-related events. */
 
-#define ShiftMask		(1<<0)
-#define LockMask		(1<<1)
-#define ControlMask		(1<<2)
-#define Mod1Mask		(1<<3)
-#define Mod2Mask		(1<<4)
-#define Mod3Mask		(1<<5)
-#define Mod4Mask		(1<<6)
-#define Mod5Mask		(1<<7)
+static const int ShiftMask		=(1<<0);
+static const int LockMask		=(1<<1);
+static const int ControlMask		=(1<<2);
+static const int Mod1Mask		=(1<<3);
+static const int Mod2Mask		=(1<<4);
+static const int Mod3Mask		=(1<<5);
+static const int Mod4Mask		=(1<<6);
+static const int Mod5Mask		=(1<<7);
+]]
 
+--[[
 /* modifier names.  Used to build a SetModifierMapping request or
    to read a GetModifierMapping request.  These correspond to the
    masks defined above. */
@@ -288,7 +293,9 @@ exports.LASTEvent		= 36	-- must be bigger than any event #
 #define RevertToNone		(int)None
 #define RevertToPointerRoot	(int)PointerRoot
 #define RevertToParent		2
+--]]
 
+--[[
 /*****************************************************************
  * ERROR CODES 
  *****************************************************************/
@@ -322,7 +329,9 @@ exports.LASTEvent		= 36	-- must be bigger than any event #
 
 #define FirstExtensionError	128
 #define LastExtensionError	255
+--]]
 
+ffi.cdef[[
 /*****************************************************************
  * WINDOW DEFINITIONS 
  *****************************************************************/
@@ -330,98 +339,100 @@ exports.LASTEvent		= 36	-- must be bigger than any event #
 /* Window classes used by CreateWindow */
 /* Note that CopyFromParent is already defined as 0 above */
 
-#define InputOutput		1
-#define InputOnly		2
+static const int InputOutput		=1;
+static const int InputOnly		=2;
 
 /* Window attributes for CreateWindow and ChangeWindowAttributes */
 
-#define CWBackPixmap		(1L<<0)
-#define CWBackPixel		(1L<<1)
-#define CWBorderPixmap		(1L<<2)
-#define CWBorderPixel           (1L<<3)
-#define CWBitGravity		(1L<<4)
-#define CWWinGravity		(1L<<5)
-#define CWBackingStore          (1L<<6)
-#define CWBackingPlanes	        (1L<<7)
-#define CWBackingPixel	        (1L<<8)
-#define CWOverrideRedirect	(1L<<9)
-#define CWSaveUnder		(1L<<10)
-#define CWEventMask		(1L<<11)
-#define CWDontPropagate	        (1L<<12)
-#define CWColormap		(1L<<13)
-#define CWCursor	        (1L<<14)
+static const int CWBackPixmap		=(1<<0);
+static const int CWBackPixel		=(1<<1);
+static const int CWBorderPixmap		=(1<<2);
+static const int CWBorderPixel      =     (1<<3);
+static const int CWBitGravity		=(1<<4);
+static const int CWWinGravity		=(1<<5);
+static const int CWBackingStore     =     (1<<6);
+static const int CWBackingPlanes	=        (1<<7);
+static const int CWBackingPixel	    =    (1<<8);
+static const int CWOverrideRedirect	=(1<<9);
+static const int CWSaveUnder		=(1<<10);
+static const int CWEventMask		=(1<<11);
+static const int CWDontPropagate	       = (1<<12);
+static const int CWColormap		=(1<<13);
+static const int CWCursor	     =   (1<<14);
 
 /* ConfigureWindow structure */
 
-#define CWX			(1<<0)
-#define CWY			(1<<1)
-#define CWWidth			(1<<2)
-#define CWHeight		(1<<3)
-#define CWBorderWidth		(1<<4)
-#define CWSibling		(1<<5)
-#define CWStackMode		(1<<6)
+static const int CWX			=(1<<0);
+static const int CWY			=(1<<1);
+static const int CWWidth		=	(1<<2);
+static const int CWHeight		=(1<<3);
+static const int CWBorderWidth	=	(1<<4);
+static const int CWSibling		=(1<<5);
+static const int CWStackMode		=(1<<6);
 
 
 /* Bit Gravity */
 
-#define ForgetGravity		0
-#define NorthWestGravity	1
-#define NorthGravity		2
-#define NorthEastGravity	3
-#define WestGravity		4
-#define CenterGravity		5
-#define EastGravity		6
-#define SouthWestGravity	7
-#define SouthGravity		8
-#define SouthEastGravity	9
-#define StaticGravity		10
+static const int ForgetGravity		=0;
+static const int NorthWestGravity	=1;
+static const int NorthGravity		=2;
+static const int NorthEastGravity	=3;
+static const int WestGravity		=4;
+static const int CenterGravity		=5;
+static const int EastGravity		=6;
+static const int SouthWestGravity	=7;
+static const int SouthGravity		=8;
+static const int SouthEastGravity	=9;
+static const int StaticGravity		=10;
 
 /* Window gravity + bit gravity above */
 
-#define UnmapGravity		0
+static const int UnmapGravity		=0;
 
 /* Used in CreateWindow for backing-store hint */
 
-#define NotUseful               0
-#define WhenMapped              1
-#define Always                  2
+static const int NotUseful              = 0;
+static const int WhenMapped             = 1;
+static const int Always                 = 2;
 
 /* Used in GetWindowAttributes reply */
 
-#define IsUnmapped		0
-#define IsUnviewable		1
-#define IsViewable		2
+static const int IsUnmapped		=0;
+static const int IsUnviewable	=1;
+static const int IsViewable		=2;
 
 /* Used in ChangeSaveSet */
 
-#define SetModeInsert           0
-#define SetModeDelete           1
+static const int SetModeInsert          = 0;
+static const int SetModeDelete          = 1;
 
 /* Used in ChangeCloseDownMode */
 
-#define DestroyAll              0
-#define RetainPermanent         1
-#define RetainTemporary         2
+static const int DestroyAll             = 0;
+static const int RetainPermanent        = 1;
+static const int RetainTemporary        = 2;
 
 /* Window stacking method (in configureWindow) */
 
-#define Above                   0
-#define Below                   1
-#define TopIf                   2
-#define BottomIf                3
-#define Opposite                4
+static const int Above                  = 0;
+static const int Below                  = 1;
+static const int TopIf                  = 2;
+static const int BottomIf               = 3;
+static const int Opposite               = 4;
 
 /* Circulation direction */
 
-#define RaiseLowest             0
-#define LowerHighest            1
+static const int RaiseLowest            = 0;
+static const int LowerHighest           = 1;
 
 /* Property modes */
 
-#define PropModeReplace         0
-#define PropModePrepend         1
-#define PropModeAppend          2
+static const int PropModeReplace        = 0;
+static const int PropModePrepend        = 1;
+static const int PropModeAppend         = 2;
+]]
 
+--[[
 /*****************************************************************
  * GRAPHICS DEFINITIONS
  *****************************************************************/

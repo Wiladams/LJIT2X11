@@ -58,10 +58,10 @@ local function init_x(title)
 	whitePixel = WhitePixel(dis, screen);
 end
 
-local myEvents = bor(ExposureMask, 
-		KeyPressMask, KeyReleaseMask,
-		ButtonPressMask,ButtonReleaseMask,
-		PointerMotionMask)
+local myEvents = bor(X11.ExposureMask, 
+		X11.KeyPressMask, X11.KeyReleaseMask,
+		X11.ButtonPressMask,X11.ButtonReleaseMask,
+		X11.PointerMotionMask)
 
 local function size(awidth, aheight, data)
 	width = awidth;
@@ -146,18 +146,17 @@ local function run ()
 
 		if (XCheckWindowEvent(dis, win, myEvents, event) ~= 0) then
 			--print("event type: ", event.type)
-			if event.type == KeyPress then
+			if event.type == X11.KeyPress then
 				keyCode = event.xkey.keycode;
 				if keyPressed then
 					keyPressed();
 				end
-			elseif event.type == KeyRelease then
+			elseif event.type == X11.KeyRelease then
 				keyCode = event.xkey.keycode;
 				if keyReleased then
 					keyReleased();
 				end
-			elseif event.type == MotionNotify then
-				-- onmousemove
+			elseif event.type == X11.MotionNotify then
 				mouseX = event.xmotion.x;
 				mouseY = event.xmotion.y;
 				if isMouseDragging then
@@ -169,7 +168,7 @@ local function run ()
 						mouseMoved()
 					end
 				end
-			elseif (event.type == ButtonPress) then
+			elseif (event.type == X11.ButtonPress) then
 				isMouseDragging = true;
 				mouseButton = event.xbutton.button;
 				mouseX = event.xbutton.x;
@@ -177,7 +176,7 @@ local function run ()
 				if mousePressed then
 					mousePressed()
 				end
-			elseif (event.type == ButtonRelease) then
+			elseif (event.type == X11.ButtonRelease) then
 				isMouseDragging = false;
 				mouseButton = event.xbutton.button;
 				mouseX = event.xbutton.x;
@@ -186,7 +185,7 @@ local function run ()
 				if mouseReleased then
 					mouseReleased()
 				end
-			elseif (event.type == Expose and event.xexpose.count == 0) then
+			elseif (event.type == X11.Expose and event.xexpose.count == 0) then
 				-- possibly only do this on a timer event?
 				if draw ~= nil then
 					draw();

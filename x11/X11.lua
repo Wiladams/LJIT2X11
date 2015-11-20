@@ -38,11 +38,34 @@ setmetatable(exports, {
 		-- try to find the key as a type
 		success, value = pcall(function() return ffi.typeof(key) end)
 		if success then
-			rawset(key, value)
+			rawset(self, key, value)
 			return value;
 		end
 
-		-- finally, return nil if it's nothing we can get to easily
+		-- finally, look in the other files to see if we find anything
+print("X11 lookup: ", key)
+		value = X[key]
+		if value then 
+			print("  found in X: ", value)
+			rawset(self, key, value)
+			return value;
+		end
+
+		value = Xlib[key]
+		if value then 
+			print("  found in Xlib: ", value)
+			rawset(self, key, value)
+			return value;
+		end
+
+		value = Xutil[key]
+		if value then 
+			print("  found in Xutil: ", value)
+			rawset(self, key, value)
+			return value;
+		end
+
+
 		return nil;
 	end,
 })
