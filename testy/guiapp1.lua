@@ -32,7 +32,7 @@ function mouseDragged()
 end
 
 function mouseMoved()
-	print("mouse move: ", mouseX, mouseY)
+	--print("mouse move: ", mouseX, mouseY)
 end
 
 --[[
@@ -41,11 +41,19 @@ end
 	Implement as many of these as your application needs.
 --]]
 function keyPressed()
-	print("keyPressed(): ", keyCode)
+	--print("keyPressed(): ", keyCode)
 end
 
 function keyReleased()
-	print("keyReleased(): ", keyCode)
+	--print("keyReleased(): ", keyCode)
+end
+
+function keyTyped(achar)
+	--print("keyTyped: ", achar)
+
+	if keyChar ~= nil then
+		print(keyChar);
+	end
 end
 
 -- A setup function isn't strictly required, but 

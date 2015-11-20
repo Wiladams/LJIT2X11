@@ -45,6 +45,8 @@ local ZPixmap	= 2;
 mouseX = 0;
 mouseY = 0;
 local isMouseDragging = false;
+keyCode = nil;
+keyChar = nil;
 
 -- important work routines
 local function init_x(title)
@@ -87,8 +89,10 @@ local function size(awidth, aheight, data)
 	X11.XClearWindow(dis, win);
 	X11.XMapRaised(dis, win);
 
+	local depth  = X11.DefaultDepth(dis,screen); 
+	print("DEPTH:", depth)
 	data = data or ffi.new("uint32_t[?]", width*height)
-	img = LXImage(width, height, 24, data, dis, vis, ZPixmap, 0, 32, 0)
+	img = LXImage(width, height, depth, data, dis, vis, ZPixmap, 0, 32, 0)
 
 	return data;
 end
@@ -124,6 +128,26 @@ initiate running their 'setup()' function, if present
 and run the event loop to deal with keyboard and mouse
 activity.
 --]]
+local function getKeyChar(event)
+	local buffer_size = 80;
+	local buffer = ffi.new("char[80]");
+	local keysym = ffi.new("KeySym[1]");
+	--/* XComposeStatus compose; is not used, though it's in some books */
+	local count = X11.XLookupString(ffi.cast("XKeyEvent *", event), 
+		buffer, buffer_size, 
+		keysym,
+		nil);
+
+	if count == 1 then
+		return string.char(buffer[0])
+	end
+
+	if count > 1 then 
+		return ffi.string(buffer, count)
+	end
+
+	return nil;
+end
 
 local function run ()
 	local event = ffi.new("XEvent");
@@ -151,9 +175,16 @@ local function run ()
 			--print("event type: ", event.type)
 			if event.type == X11.KeyPress then
 				keyCode = event.xkey.keycode;
+				keyChar = getKeyChar(event)
+
 				if keyPressed then
 					keyPressed();
 				end
+
+				if keyTyped then
+					keyTyped(keyChar)
+				end
+
 			elseif event.type == X11.KeyRelease then
 				keyCode = event.xkey.keycode;
 				if keyReleased then

@@ -126,7 +126,13 @@ exports.AllPlanes = bnot(0);		-- ((unsigned long)~0L)
 #define ProtocolRevision(dpy) 	(((_XPrivDisplay)dpy)->proto_minor_version)
 #define VendorRelease(dpy) 	(((_XPrivDisplay)dpy)->release)
 #define DisplayString(dpy) 	(((_XPrivDisplay)dpy)->display_name)
-#define DefaultDepth(dpy, scr) 	(ScreenOfDisplay(dpy,scr)->root_depth)
+--]]
+
+function exports.DefaultDepth(dpy, scr) 	
+	return (exports.ScreenOfDisplay(dpy,scr).root_depth)
+end
+
+--[[
 #define DefaultColormap(dpy, scr)(ScreenOfDisplay(dpy,scr)->cmap)
 #define BitmapUnit(dpy) 	(((_XPrivDisplay)dpy)->bitmap_unit)
 #define BitmapBitOrder(dpy) 	(((_XPrivDisplay)dpy)->bitmap_bit_order)

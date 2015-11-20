@@ -43,24 +43,24 @@ setmetatable(exports, {
 		end
 
 		-- finally, look in the other files to see if we find anything
-print("X11 lookup: ", key)
+--print("X11 lookup: ", key)
 		value = X[key]
 		if value then 
-			print("  found in X: ", value)
+			--print("  found in X: ", value)
 			rawset(self, key, value)
 			return value;
 		end
 
 		value = Xlib[key]
 		if value then 
-			print("  found in Xlib: ", value)
+			--print("  found in Xlib: ", value)
 			rawset(self, key, value)
 			return value;
 		end
 
 		value = Xutil[key]
 		if value then 
-			print("  found in Xutil: ", value)
+			--print("  found in Xutil: ", value)
 			rawset(self, key, value)
 			return value;
 		end
