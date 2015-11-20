@@ -50,12 +50,12 @@ local isMouseDragging = false;
 local function init_x(title)
 	title = title or "GuiApplication"
 
-	dis = XOpenDisplay(nil);
+	dis = X11.XOpenDisplay(nil);
    	screen = DefaultScreen(dis);
-   	vis = XDefaultVisual(dis, screen)
+   	vis = X11.XDefaultVisual(dis, screen)
 
-	blackPixel = BlackPixel(dis,screen);
-	whitePixel = WhitePixel(dis, screen);
+	blackPixel = X11.BlackPixel(dis,screen);
+	whitePixel = X11.WhitePixel(dis, screen);
 end
 
 local myEvents = bor(X11.ExposureMask, 
@@ -68,24 +68,24 @@ local function size(awidth, aheight, data)
 	height = aheight;
 
 
-   	win = XCreateSimpleWindow(dis,
-   		DefaultRootWindow(dis),
+   	win = X11.XCreateSimpleWindow(dis,
+   		X11.DefaultRootWindow(dis),
    		0,0,	
 		width, height, 
 		5,
 		blackPixel, whitePixel);
 
-	XSetStandardProperties(dis,win,title,"Hi",None,nil,0,nil);
+	X11.XSetStandardProperties(dis,win,title,"Hi",None,nil,0,nil);
 
 
-	XSelectInput(dis, win, myEvents);
+	X11.XSelectInput(dis, win, myEvents);
     
-    gc = XCreateGC(dis, win, 0,nil);        
+    gc = X11.XCreateGC(dis, win, 0,nil);        
 	
-	XSetBackground(dis,gc,whitePixel);
-	XSetForeground(dis,gc,blackPixel);
-	XClearWindow(dis, win);
-	XMapRaised(dis, win);
+	X11.XSetBackground(dis,gc,whitePixel);
+	X11.XSetForeground(dis,gc,blackPixel);
+	X11.XClearWindow(dis, win);
+	X11.XMapRaised(dis, win);
 
 	data = data or ffi.new("uint32_t[?]", width*height)
 	img = LXImage(width, height, 24, data, dis, vis, ZPixmap, 0, 32, 0)
@@ -94,10 +94,10 @@ local function size(awidth, aheight, data)
 end
 
 local function close_x()
-	XFreeGC(dis, gc);
-	XDestroyWindow(dis,win);
-	XCloseDisplay(dis);				
-	error();
+	X11.XFreeGC(dis, gc);
+	X11.XDestroyWindow(dis,win);
+	X11.XCloseDisplay(dis);				
+	--error();
 end
 
 --[[
@@ -106,7 +106,7 @@ pixmap, which represents the drawing the user is doing
 and puts that on the Window.
 --]]
 local function redraw()
-	XPutImage(dis,
+	X11.XPutImage(dis,
     	win,
     	gc,
     	img.Handle,
@@ -144,7 +144,10 @@ local function run ()
 			loop()
 		end
 
-		if (XCheckWindowEvent(dis, win, myEvents, event) ~= 0) then
+		if (X11.XPending(dis) > 0) then
+			X11.XNextEvent(dis,event)
+
+		--if (XCheckWindowEvent(dis, win, myEvents, event) ~= 0) then
 			--print("event type: ", event.type)
 			if event.type == X11.KeyPress then
 				keyCode = event.xkey.keycode;

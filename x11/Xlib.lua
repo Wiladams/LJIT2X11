@@ -9,7 +9,7 @@ local band = bit.band
 require("x11.X")
 
 
-local Lib_X11 = ffi.load("X11")
+local Lib_X11 = ffi.load("X11", true)
 local exports = {
 	Lib_X11 = Lib_X11;
 }
@@ -21,6 +21,23 @@ setmetatable(exports, {
 		end
 
 		return self;
+	end,
+
+	__index = function(self, key)
+		-- First, see if it's one of the functions or constants
+		-- in the library
+		local success, value = pcall(function() return ffi.C[key] end)
+		if success then
+			rawset(self, key, value)
+			return value;
+		end
+
+		-- try to find the key as a type
+		success, value = pcall(function() return ffi.typeof(key) end)
+		if success then
+			rawset(self, key, value)
+			return value;
+		end
 	end,
 })
 
@@ -4151,31 +4168,6 @@ extern void XFreeEventData(
     XGenericEventCookie*	/* cookie*/
 );
 ]]
-
--- Library functions
-exports.XOpenDisplay = Lib_X11.XOpenDisplay;
-exports.XCheckWindowEvent = Lib_X11.XCheckWindowEvent;
-exports.XClearWindow = Lib_X11.XClearWindow;
-exports.XCloseDisplay = Lib_X11.XCloseDisplay;
-exports.XCreateGC = Lib_X11.XCreateGC;
-exports.XCreateImage = Lib_X11.XCreateImage;
-exports.XInitImage = Lib_X11.XInitImage;
-exports.XCreateSimpleWindow = Lib_X11.XCreateSimpleWindow;
-exports.XDefaultVisual = Lib_X11.XDefaultVisual;
-exports.XDestroyWindow = Lib_X11.XDestroyWindow;
-exports.XDrawString = Lib_X11.XDrawString;
-exports.XFreeGC = Lib_X11.XFreeGC;
-exports.XGetWindowAttributes = Lib_X11.XGetWindowAttributes;
-exports.XInternAtom = Lib_X11.XInternAtom;
-exports.XMapRaised = Lib_X11.XMapRaised;
-exports.XMapWindow = Lib_X11.XMapWindow;
-exports.XNextEvent = Lib_X11.XNextEvent;
-exports.XPutImage = Lib_X11.XPutImage;
-exports.XSelectInput = Lib_X11.XSelectInput;
-exports.XSetBackground = Lib_X11.XSetBackground;
-exports.XSetForeground = Lib_X11.XSetForeground;
-exports.XSetWMProtocols = Lib_X11.XSetWMProtocols;
-exports.XStoreName = Lib_X11.XStoreName;
 
 
 return exports
