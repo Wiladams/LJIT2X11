@@ -1,9 +1,18 @@
---[[
-	A simple example of a minimal X11 program displaying pixmap
-http://www.linuxquestions.org/questions/programming-9/how-to-draw-color-images-with-xlib-339366/
+-- GuiApp.lua
 
---]]
 package.path = package.path..";../?.lua"
+
+local X11Interactor = require("X11Interactor")
+
+
+
+
+
+
+
+
+
+
 
 local ffi = require("ffi")
 local bit = require("bit")
@@ -11,21 +20,7 @@ local bor = bit.bor
 local band = bit.band
 
 
---[[
-	if you require X11, and call it as a function, then 
-	everything in the X11 binding will be made global.
-	This gives you a programming environment just like when 
-	you program X11 using 'C'.
 
-	If you don't want that behavior, then simply do:
-	
-	local X11 = require("X11")
-
-	And get at the various functions you want through the 
-	various table entries.
---]]
-local X11 = require("x11.X11")()
-local LXImage = require("x11.LXImage")
 
 -- some global variables
 local dis = nil;
@@ -149,31 +144,9 @@ local function getKeyChar(event)
 	return nil;
 end
 
-local function run ()
-	local event = ffi.new("XEvent");
+local function tracker (activity)
 
-	init_x();
-
-	-- if the user has implemented a global 'setup' routine
-	-- it is expected that the user will at least call
-	-- the size() function, or they won't see a window
-	if setup then
-		setup()
-	end
-
-	-- the primary event loop
-
-	while( true ) do
-		if nil ~= loop then
-			loop()
-		end
-
-		if (X11.XPending(dis) > 0) then
-			X11.XNextEvent(dis,event)
-
-		--if (XCheckWindowEvent(dis, win, myEvents, event) ~= 0) then
-			--print("event type: ", event.type)
-			if event.type == X11.KeyPress then
+	if event.kind == "keypress" then
 				keyCode = event.xkey.keycode;
 				keyChar = getKeyChar(event)
 
@@ -185,12 +158,12 @@ local function run ()
 					keyTyped(keyChar)
 				end
 
-			elseif event.type == X11.KeyRelease then
+	elseif activity.kind == "keyrelease" then
 				keyCode = event.xkey.keycode;
 				if keyReleased then
 					keyReleased();
 				end
-			elseif event.type == X11.MotionNotify then
+	elseif event.kind == "mousemove" then
 				mouseX = event.xmotion.x;
 				mouseY = event.xmotion.y;
 				if isMouseDragging then
@@ -202,7 +175,7 @@ local function run ()
 						mouseMoved()
 					end
 				end
-			elseif (event.type == X11.ButtonPress) then
+	elseif (event.kind == "buttonpress") then
 				isMouseDragging = true;
 				mouseButton = event.xbutton.button;
 				mouseX = event.xbutton.x;
@@ -210,7 +183,7 @@ local function run ()
 				if mousePressed then
 					mousePressed()
 				end
-			elseif (event.type == X11.ButtonRelease) then
+	elseif event.kind == "buttonrelease" then
 				isMouseDragging = false;
 				mouseButton = event.xbutton.button;
 				mouseX = event.xbutton.x;
@@ -219,28 +192,15 @@ local function run ()
 				if mouseReleased then
 					mouseReleased()
 				end
-			elseif (event.type == X11.Expose and event.xexpose.count == 0) then
-				-- possibly only do this on a timer event?
-				if draw ~= nil then
-					draw();
-				end
-
-			end
-		end
-		
-		-- blit our pixmap to the window
-		redraw();
 	end
 end
 
-local exports = {
-	run = run;
-	size = size;
-
-	width = width;
-	height = height;
-
-}
 
 
-return exports
+local function tracker(activity)
+end
+
+local driver = X11Interactor({Title="GuiApp", InputTracker = tracker})
+
+return driver
+
