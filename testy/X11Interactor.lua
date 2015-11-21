@@ -123,11 +123,12 @@ end
 	Modifiers are applied.
 	nil is returned if it's not a printable key
 --]]
+local buffer_size = 80;
+local buffer = ffi.new("char[80]");
+local keysym = ffi.new("KeySym[1]");
+
 local function getKeyChar(event)
-	local buffer_size = 80;
-	local buffer = ffi.new("char[80]");
-	local keysym = ffi.new("KeySym[1]");
-	--/* XComposeStatus compose; is not used, though it's in some books */
+
 	local count = X11.XLookupString(ffi.cast("XKeyEvent *", event), 
 		buffer, buffer_size, 
 		keysym,
@@ -209,6 +210,9 @@ function X11Interactor.run(self)
 		
 		-- blit our pixmap to the window
 		self:redraw();
+
+		-- we MUST run in a cooperative environment
+		yield();
 	end
 end
 

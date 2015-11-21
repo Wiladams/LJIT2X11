@@ -7,36 +7,32 @@ local bit = require("bit")
 local bor = bit.bor
 local band = bit.band
 
+local kernel = require("kernel")
 local X11Interactor = require("X11Interactor")
-
-
-
-
-
-
+local DrawingContext = require("DrawingContext")
 
 
 -- some global variables
-local dis = nil;
-local screen = nil;
-local win = nil;
-local gc = nil;
-local vis = nil;
-local img = nil;
 local width = 640;
 local height = 480;
-local black = nil;
-local white = nil;
 
 
 -- mouse information
 mouseX = 0;
 mouseY = 0;
 local isMouseDragging = false;
+
+-- keyboard information
 keyCode = nil;
 keyChar = nil;
 
 
+--[[
+	This function is called by the Interactor whenever there
+	are interesting events, such as mouse and keyboard.  This
+	is the primary tie between the platform, and the rest
+	of the application.
+--]]
 local function tracker (activity)
 
 	if activity.kind == "keypress" then
@@ -96,15 +92,15 @@ function size(awidth, aheight)
 	height = aheight;
 
 	local data = driver:size(awidth, aheight)
+	local dc = DrawingContext(awidth, aheight, data)
 
-	return data;
+	return dc;
 end
-
-
 
 local exports = {
 	size = size;
-	run = function() driver:run() end;
 }
+
+spawn(driver.run, driver)
 
 return exports

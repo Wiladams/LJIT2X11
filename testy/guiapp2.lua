@@ -1,10 +1,14 @@
 #!/usr/bin/env luajit
 
---guiapp1.lua
+--guiapp2.lua
 package.path = package.path..";../?.lua"
 
+
+--[[
+	Test using the GuiApp concept, whereby the interactor
+	is a pluggable component.
+--]]
 local gap = require("GuiApp")
-local DrawingContext = require("DrawingContext")
 local colors = require("colors")
 
 local awidth = 640;
@@ -61,8 +65,7 @@ end
 -- will be created.
 function setup()
 	print("setup")
-	local data = size(awidth,aheight)
-	dc = DrawingContext(awidth, aheight, data)
+	dc = size(awidth,aheight)
 end
 
 local count = 1;
@@ -83,5 +86,16 @@ function loop()
 	dc:rect(210, 30, 100, 100, colors.blue)
 end
 
+local function tick()
+	local count = 1
+	
+	while true do
+		print("tick: ", count)
+		count = count + 1;
+		yield();
+	end
+end
 
-gap.run()
+spawn(tick)
+
+run()
