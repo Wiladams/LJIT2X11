@@ -99,15 +99,15 @@ exports.QueuedAfterFlush = 2
 
 
 function exports.ConnectionNumber(dpy) 	return ffi.cast("_XPrivDisplay",dpy).fd end
-function exports.RootWindow(dpy, scr) 	return (ScreenOfDisplay(dpy,scr).root) end
+function exports.RootWindow(dpy, scr) 	return (exports.ScreenOfDisplay(dpy,scr).root) end
 
 
 function exports.DefaultScreen(dpy) 	return ffi.cast("_XPrivDisplay", dpy).default_screen end
-function exports.DefaultRootWindow(dpy) 	return ScreenOfDisplay(dpy,DefaultScreen(dpy)).root end
-function exports.DefaultVisual(dpy, scr) return ScreenOfDisplay(dpy,scr).root_visual end
-function exports.DefaultGC(dpy, scr) 	return ScreenOfDisplay(dpy,scr).default_gc end
-function exports.BlackPixel(dpy, scr) 	return ScreenOfDisplay(dpy,scr).black_pixel end
-function exports.WhitePixel(dpy, scr) 	return ScreenOfDisplay(dpy,scr).white_pixel end
+function exports.DefaultRootWindow(dpy) 	return exports.ScreenOfDisplay(dpy,exports.DefaultScreen(dpy)).root end
+function exports.DefaultVisual(dpy, scr) return exports.ScreenOfDisplay(dpy,scr).root_visual end
+function exports.DefaultGC(dpy, scr) 	return exports.ScreenOfDisplay(dpy,scr).default_gc end
+function exports.BlackPixel(dpy, scr) 	return exports.ScreenOfDisplay(dpy,scr).black_pixel end
+function exports.WhitePixel(dpy, scr) 	return exports.ScreenOfDisplay(dpy,scr).white_pixel end
 
 
 exports.AllPlanes = bnot(0);		-- ((unsigned long)~0L)

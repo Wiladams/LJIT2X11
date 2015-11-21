@@ -38,19 +38,19 @@ local function defaultTracker(activity)
 end
 
 function X11Interactor.init(self, params)
-
+print("X11Interactor.init: ", params)
 	local dis = X11.XOpenDisplay(nil);
 
 	local obj = {
 		Title = params.Title or "GuiApplication";
 		dis = dis;
    		screen = X11.DefaultScreen(dis);
-   		vis = X11.XDefaultVisual(dis, DefaultScreen(dis));
+   		vis = X11.XDefaultVisual(dis, X11.DefaultScreen(dis));
 
 		InputTracker = params.InputTracker or defaultTracker;
 	}
 
-	setmetatable(obj, X11Interactor)
+	setmetatable(obj, X11Interactor_mt)
 
 	return obj;
 end
@@ -76,7 +76,7 @@ function X11Interactor.size(self, awidth, aheight, data)
 		5,
 		blackPixel, whitePixel);
 
-	X11.XSetStandardProperties(self.dis,self.Window,self.Title,"Hi",None,nil,0,nil);
+	X11.XSetStandardProperties(self.dis,self.Window,self.Title,"Hi",X11.None,nil,0,nil);
 
 
 	X11.XSelectInput(self.dis, self.Window, myEvents);
@@ -90,7 +90,7 @@ function X11Interactor.size(self, awidth, aheight, data)
 
 	local depth  = X11.DefaultDepth(self.dis,self.screen); 
 
-	data = data or ffi.new("uint32_t[?]", width*height)
+	data = data or ffi.new("uint32_t[?]", awidth*aheight)
 	self.img = LXImage(awidth, aheight, depth, data, self.dis, self.vis, X11.ZPixmap, 0, 32, 0)
 
 	return data;
@@ -152,7 +152,7 @@ initiate running their 'setup()' function, if present
 and run the event loop to deal with keyboard and mouse
 activity.
 --]]
-function X11Interactor.run (self)
+function X11Interactor.run(self)
 	local event = ffi.new("XEvent");
 
 	-- if the user has implemented a global 'setup' routine
@@ -208,7 +208,7 @@ function X11Interactor.run (self)
 		end
 		
 		-- blit our pixmap to the window
-		redraw();
+		self:redraw();
 	end
 end
 
