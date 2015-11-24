@@ -46,3 +46,24 @@ piece of data, which represents the framebuffer of the window that is created.  
 essence the data backing a XPixmap data structure.  You are free to draw into this data pointer.
 The layout is that of a 32-bit rgba.  Each row is width*4 bytes wide.  You can build up fundamental drawing routines from here.
 
+Miscellany
+----------
+
+colors.lua
+This is a convenience class that contains some simple RGBA color values stuffed into 
+uint32_t.  They are suitable for doing your own drawing directly into the constructed
+framebuffer returned from the X11Interactor:size() call.
+
+DrawingContext.lua
+This represents a very rudimentary 2D renderer.  The core function is setPixel().  
+Horizontal lines, and rectangles are built atop that.  No other functions are 
+available.  This is just enough to be able to write simple test cases that can
+show something rendered in a window.
+
+gen_keysymdeff.lua
+This is a utility function that is used to create the 'keysymdef.lua' file found in the 
+x11 directory.  
+
+tinylibc.lua
+Contains a number of useful ffi calss required by the kernel.  It is also a convenient 
+place to put any additional such calls, for interaction with the libc library.

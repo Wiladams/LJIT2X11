@@ -165,9 +165,14 @@ function X11Interactor.run(self)
 	-- the primary event loop
 
 	while( true ) do
-		if nil ~= loop then
-			loop()
+		local success, err = signalAll('loop')
+		if not success then 
+			print("signalAll: ", err)
 		end
+
+		--if nil ~= loop then
+		--	loop()
+		--end
 
 		if (X11.XPending(self.dis) > 0) then
 			X11.XNextEvent(self.dis,event)

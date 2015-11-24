@@ -453,10 +453,10 @@ local function waitForSignal(eventName)
 	return suspend()
 end
 
-local function onSignal(self, func, eventName)
+local function onSignal(func, eventName)
+	--print("onSignal: ", func, eventName)
 	local function closure()
-		waitForSignal(eventName)
-		func();
+		func(waitForSignal(eventName));
 	end
 
 	return spawn(closure)
