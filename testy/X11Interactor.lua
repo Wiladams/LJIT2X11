@@ -5,7 +5,6 @@
 	on the screen.  It also captures mouse and keyboard activity 
 	and forwards to the specified recipient.
 --]]
---package.path = package.path..";../?.lua"
 
 local ffi = require("ffi")
 local bit = require("bit")
