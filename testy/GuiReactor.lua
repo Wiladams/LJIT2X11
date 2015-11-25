@@ -9,7 +9,6 @@ local band = bit.band
 
 local kernel = require("kernel")
 local X11Interactor = require("X11Interactor")
-local DrawingContext = require("DrawingContext")
 
 
 -- some global variables
@@ -95,14 +94,13 @@ local function onLoop(activity)
 	end
 end
 
-local driver = X11Interactor({Title="GuiApp"})
+local driver = X11Interactor()
 
 function size(awidth, aheight)
 	width = awidth;
 	height = aheight;
 
-	local data = driver:size(awidth, aheight)
-	local graphPort = DrawingContext(awidth, aheight, data)
+	local graphPort = driver:graphPort(awidth, aheight)
 
 	return graphPort;
 end

@@ -13,6 +13,8 @@ local band, bor = bit.band, bit.bor
 
 local X11 = require("x11.X11")
 local LXImage = require("x11.LXImage")
+local DrawingContext = require("DrawingContext")
+
 
 
 local X11Interactor = {}
@@ -33,8 +35,9 @@ local myEvents = bor(X11.ExposureMask,
 
 
 function X11Interactor.init(self, params)
+	params = params or {}
 	local dis = X11.XOpenDisplay(nil);
-
+	
 	local obj = {
 		Title = params.Title or "X11Interactor";
 		dis = dis;
@@ -52,7 +55,7 @@ function X11Interactor.new(self, params)
 end
 
 
-function X11Interactor.size(self, awidth, aheight, data)
+function X11Interactor.graphPort(self, awidth, aheight, data)
 
 	local blackPixel = X11.BlackPixel(self.dis, self.screen);
 	local whitePixel = X11.WhitePixel(self.dis, self.screen);
@@ -85,7 +88,9 @@ function X11Interactor.size(self, awidth, aheight, data)
 	data = data or ffi.new("uint32_t[?]", awidth*aheight)
 	self.img = LXImage(awidth, aheight, depth, data, self.dis, self.vis, X11.ZPixmap, 0, 32, 0)
 
-	return data;
+	local graphPort = DrawingContext(awidth, aheight, data)
+
+	return graphPort;
 end
 
 function X11Interactor.close()
