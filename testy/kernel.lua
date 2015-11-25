@@ -462,6 +462,16 @@ local function onSignal(func, eventName)
 	return spawn(closure)
 end
 
+local function onSignalContinue(eventName, func)
+	local function closure()
+		while true do
+			print("onSignalContinue.waitForSignal: ", waitForSignal(eventName))
+		end
+	end
+
+	return spawn(closure)
+end
+
 
 local function run(func, ...)
 	-- start cooperative io module
@@ -501,6 +511,7 @@ local exports = {
     yield = yield;
     
     -- signals/events
+    on = onSignalContinue;
     onSignal = onSignal;
     signalAll = signalAll;
     signalOne = signalOne;

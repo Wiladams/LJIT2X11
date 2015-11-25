@@ -33,26 +33,27 @@ keyChar = nil;
 	is the primary tie between the platform, and the rest
 	of the application.
 --]]
-local function tracker (activity)
+local function onKeyPress(activity)
+	keyCode = activity.keycode;
+	keyChar = activity.keychar;
 
-	if activity.kind == "keypress" then
-				keyCode = activity.keycode;
-				keyChar = activity.keychar;
+	if keyPressed then
+		keyPressed();
+	end
 
-				if keyPressed then
-					keyPressed();
-				end
+	if keyTyped then
+		keyTyped(keyChar)
+	end
+end
 
-				if keyTyped then
-					keyTyped(keyChar)
-				end
+local function onKeyRelease(activity)
+	keyCode = activity.keycode;
+	if keyReleased then
+		keyReleased();
+	end
+end
 
-	elseif activity.kind == "keyrelease" then
-				keyCode = activity.keycode;
-				if keyReleased then
-					keyReleased();
-				end
-	elseif activity.kind == "mousemove" then
+local function onMouseMove(activity)
 		mouseX = activity.x;
 		mouseY = activity.y;
 		if isMouseDragging then
@@ -64,7 +65,9 @@ local function tracker (activity)
 				mouseMoved()
 			end
 		end
-	elseif (activity.kind == "buttonpress") then
+end
+
+local function onButtonPress(activity)
 		isMouseDragging = true;
 		mouseButton = activity.button;
 		mouseX = activity.x;
@@ -72,8 +75,10 @@ local function tracker (activity)
 		if mousePressed then
 			mousePressed()
 		end
-	elseif activity.kind == "buttonrelease" then
-		isMouseDragging = false;
+end
+
+local function onButtonRelease(activity)
+			isMouseDragging = false;
 		mouseButton = activity.button;
 		mouseX = activity.x;
 		mouseY = activity.y;
@@ -81,11 +86,10 @@ local function tracker (activity)
 		if mouseReleased then
 			mouseReleased()
 		end
-	end
 end
 
 
-local driver = X11Interactor({Title="GuiApp", InputTracker = tracker})
+local driver = X11Interactor({Title="GuiApp"})
 
 function size(awidth, aheight)
 	width = awidth;
@@ -100,6 +104,12 @@ end
 local exports = {
 	size = size;
 }
+
+on("keypress", onKeyPress)
+on("keyrelease", onKeyRelease)
+on("mousepress", onMousePress)
+on("mouserelease", onMouseRelease)
+on("mousemove", onMouseMove)
 
 spawn(driver.run, driver)
 

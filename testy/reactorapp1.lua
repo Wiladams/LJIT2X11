@@ -78,6 +78,6 @@ end
 
 
 
-onSignal(looper, "loop")
+--on("loop", looper)
 
 run()

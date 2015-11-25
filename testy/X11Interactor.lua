@@ -166,49 +166,52 @@ function X11Interactor.run(self)
 
 	while( true ) do
 		local success, err = signalAll('loop')
-		if not success then 
-			print("signalAll: ", err)
-		end
-
-		--if nil ~= loop then
-		--	loop()
-		--end
 
 		if (X11.XPending(self.dis) > 0) then
 			X11.XNextEvent(self.dis,event)
 
 			if event.type == X11.KeyPress then
-				self.InputTracker({
+				local event = {
 						kind = "keypress",
 						keycode = event.xkey.keycode,
 						keychar = getKeyChar(event),
-						})
+						}
+				signalAll("keypress")
+				--self.InputTracker()
 			elseif event.type == X11.KeyRelease then
-				self.InputTracker({
+				local event = {
 						kind = "keyrelease",
 						keycode = event.xkey.keycode,
 						keychar = getKeyChar(event),
-						})
+						}
+				signalAll("keyrelease")
+				--self.InputTracker(event)
 			elseif event.type == X11.MotionNotify then
-				self.InputTracker({
+				local event = {
 						kind = "mousemove",
 						x = event.xmotion.x,
 						y = event.xmotion.y,
-						})
+						}
+				signalAll("mousemove")
+				--self.InputTracker()
 			elseif (event.type == X11.ButtonPress) then
-				self.InputTracker({
+				local event = {
 						kind = "buttonpress",
 						x = event.xmotion.x,
 						y = event.xmotion.y,
 						button = event.xbutton.button,
-						})
+						}
+				signalAll("buttonpress")
+				--self.InputTracker(event)
 			elseif (event.type == X11.ButtonRelease) then
-				self.InputTracker({
+				local event = {
 						kind = "buttonrelease",
 						x = event.xmotion.x,
 						y = event.xmotion.y,
 						button = event.xbutton.button,
-						})
+						}
+				signalAll("buttonrelease")
+				--self.InputTracker(event)
 			end
 		end
 		
