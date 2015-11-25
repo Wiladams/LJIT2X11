@@ -56,6 +56,7 @@ end
 local function onMouseMove(activity)
 		mouseX = activity.x;
 		mouseY = activity.y;
+
 		if isMouseDragging then
 			if mouseDragged then
 				mouseDragged()
@@ -88,6 +89,11 @@ local function onButtonRelease(activity)
 		end
 end
 
+local function onLoop(activity)
+	if loop then
+		loop()
+	end
+end
 
 local driver = X11Interactor({Title="GuiApp"})
 
@@ -96,9 +102,9 @@ function size(awidth, aheight)
 	height = aheight;
 
 	local data = driver:size(awidth, aheight)
-	local dc = DrawingContext(awidth, aheight, data)
+	local graphPort = DrawingContext(awidth, aheight, data)
 
-	return dc;
+	return graphPort;
 end
 
 local exports = {
@@ -107,9 +113,10 @@ local exports = {
 
 on("keypress", onKeyPress)
 on("keyrelease", onKeyRelease)
-on("mousepress", onMousePress)
-on("mouserelease", onMouseRelease)
+on("buttonpress", onButtonPress)
+on("buttonrelease", onButtonRelease)
 on("mousemove", onMouseMove)
+on("loop", onLoop)
 
 spawn(driver.run, driver)
 

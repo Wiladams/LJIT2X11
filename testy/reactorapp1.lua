@@ -14,14 +14,8 @@ local colors = require("colors")
 local awidth = 640;
 local aheight = 480;
 
-local dc = nil;
+local graphPort = nil;
 
-local count = 1;
-
-local function looper(activity)
-	print("loop", count)
-	count = count + 1;
-end
 
 --[[
 	Mouse Activity functions.  Implement whichever
@@ -72,12 +66,18 @@ end
 -- will be created.
 function setup()
 	print("setup")
-	dc = size(awidth,aheight)
+	graphPort = size(awidth,aheight)
 end
 
+function loop()
+	graphPort:setPixel(10, 10, colors.white)
 
+	graphPort:hline(10, 20, 100, colors.white)
 
+	graphPort:rect(10, 30, 100, 100, colors.red)
+	graphPort:rect(110, 30, 100, 100, colors.green)
+	graphPort:rect(210, 30, 100, 100, colors.blue)
+end
 
---on("loop", looper)
 
 run()

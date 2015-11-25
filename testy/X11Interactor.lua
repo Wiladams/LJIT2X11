@@ -176,7 +176,7 @@ function X11Interactor.run(self)
 						keycode = event.xkey.keycode,
 						keychar = getKeyChar(event),
 						}
-				signalAll("keypress")
+				signalAll("keypress", event)
 				--self.InputTracker()
 			elseif event.type == X11.KeyRelease then
 				local event = {
@@ -184,7 +184,7 @@ function X11Interactor.run(self)
 						keycode = event.xkey.keycode,
 						keychar = getKeyChar(event),
 						}
-				signalAll("keyrelease")
+				signalAll("keyrelease", event)
 				--self.InputTracker(event)
 			elseif event.type == X11.MotionNotify then
 				local event = {
@@ -192,8 +192,8 @@ function X11Interactor.run(self)
 						x = event.xmotion.x,
 						y = event.xmotion.y,
 						}
-				signalAll("mousemove")
-				--self.InputTracker()
+				signalAll("mousemove", event)
+				--self.InputTracker(event)
 			elseif (event.type == X11.ButtonPress) then
 				local event = {
 						kind = "buttonpress",
@@ -201,7 +201,7 @@ function X11Interactor.run(self)
 						y = event.xmotion.y,
 						button = event.xbutton.button,
 						}
-				signalAll("buttonpress")
+				signalAll("buttonpress", event)
 				--self.InputTracker(event)
 			elseif (event.type == X11.ButtonRelease) then
 				local event = {
@@ -210,7 +210,7 @@ function X11Interactor.run(self)
 						y = event.xmotion.y,
 						button = event.xbutton.button,
 						}
-				signalAll("buttonrelease")
+				signalAll("buttonrelease", event)
 				--self.InputTracker(event)
 			end
 		end
