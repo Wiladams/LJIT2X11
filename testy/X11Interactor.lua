@@ -32,21 +32,14 @@ local myEvents = bor(X11.ExposureMask,
 		X11.PointerMotionMask)
 
 
-local function defaultTracker(activity)
-	print("defaultTracker: ", activity)
-end
-
 function X11Interactor.init(self, params)
-print("X11Interactor.init: ", params)
 	local dis = X11.XOpenDisplay(nil);
 
 	local obj = {
-		Title = params.Title or "GuiApplication";
+		Title = params.Title or "X11Interactor";
 		dis = dis;
    		screen = X11.DefaultScreen(dis);
    		vis = X11.XDefaultVisual(dis, X11.DefaultScreen(dis));
-
-		InputTracker = params.InputTracker or defaultTracker;
 	}
 
 	setmetatable(obj, X11Interactor_mt)
@@ -177,7 +170,6 @@ function X11Interactor.run(self)
 						keychar = getKeyChar(event),
 						}
 				signalAll("keypress", event)
-				--self.InputTracker()
 			elseif event.type == X11.KeyRelease then
 				local event = {
 						kind = "keyrelease",
@@ -185,7 +177,6 @@ function X11Interactor.run(self)
 						keychar = getKeyChar(event),
 						}
 				signalAll("keyrelease", event)
-				--self.InputTracker(event)
 			elseif event.type == X11.MotionNotify then
 				local event = {
 						kind = "mousemove",
@@ -193,7 +184,6 @@ function X11Interactor.run(self)
 						y = event.xmotion.y,
 						}
 				signalAll("mousemove", event)
-				--self.InputTracker(event)
 			elseif (event.type == X11.ButtonPress) then
 				local event = {
 						kind = "buttonpress",
@@ -202,7 +192,6 @@ function X11Interactor.run(self)
 						button = event.xbutton.button,
 						}
 				signalAll("buttonpress", event)
-				--self.InputTracker(event)
 			elseif (event.type == X11.ButtonRelease) then
 				local event = {
 						kind = "buttonrelease",
@@ -211,14 +200,14 @@ function X11Interactor.run(self)
 						button = event.xbutton.button,
 						}
 				signalAll("buttonrelease", event)
-				--self.InputTracker(event)
 			end
 		end
 		
 		-- blit our pixmap to the window
 		self:redraw();
 
-		-- we MUST run in a cooperative environment
+		-- we MUST yield, or nothing else will get a chance
+		-- to run
 		yield();
 	end
 end
