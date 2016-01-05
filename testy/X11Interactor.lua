@@ -13,6 +13,8 @@ local band, bor = bit.band, bit.bor
 
 local X11 = require("x11.X11")
 local LXImage = require("x11.LXImage")
+local DrawingContext = require("DrawingContext")
+
 
 
 local X11Interactor = {}
@@ -32,21 +34,15 @@ local myEvents = bor(X11.ExposureMask,
 		X11.PointerMotionMask)
 
 
-local function defaultTracker(activity)
-	print("defaultTracker: ", activity)
-end
-
 function X11Interactor.init(self, params)
-print("X11Interactor.init: ", params)
+	params = params or {}
 	local dis = X11.XOpenDisplay(nil);
-
+	
 	local obj = {
-		Title = params.Title or "GuiApplication";
+		Title = params.Title or "X11Interactor";
 		dis = dis;
    		screen = X11.DefaultScreen(dis);
    		vis = X11.XDefaultVisual(dis, X11.DefaultScreen(dis));
-
-		InputTracker = params.InputTracker or defaultTracker;
 	}
 
 	setmetatable(obj, X11Interactor_mt)
@@ -59,7 +55,7 @@ function X11Interactor.new(self, params)
 end
 
 
-function X11Interactor.size(self, awidth, aheight, data)
+function X11Interactor.graphPort(self, awidth, aheight, data)
 
 	local blackPixel = X11.BlackPixel(self.dis, self.screen);
 	local whitePixel = X11.WhitePixel(self.dis, self.screen);
@@ -92,7 +88,9 @@ function X11Interactor.size(self, awidth, aheight, data)
 	data = data or ffi.new("uint32_t[?]", awidth*aheight)
 	self.img = LXImage(awidth, aheight, depth, data, self.dis, self.vis, X11.ZPixmap, 0, 32, 0)
 
-	return data;
+	local graphPort = DrawingContext(awidth, aheight, data)
+
+	return graphPort;
 end
 
 function X11Interactor.close()
@@ -176,24 +174,21 @@ function X11Interactor.run(self)
 						keycode = event.xkey.keycode,
 						keychar = getKeyChar(event),
 						}
-				signalAll("keypress")
-				--self.InputTracker()
+				signalAll("keypress", event)
 			elseif event.type == X11.KeyRelease then
 				local event = {
 						kind = "keyrelease",
 						keycode = event.xkey.keycode,
 						keychar = getKeyChar(event),
 						}
-				signalAll("keyrelease")
-				--self.InputTracker(event)
+				signalAll("keyrelease", event)
 			elseif event.type == X11.MotionNotify then
 				local event = {
 						kind = "mousemove",
 						x = event.xmotion.x,
 						y = event.xmotion.y,
 						}
-				signalAll("mousemove")
-				--self.InputTracker()
+				signalAll("mousemove", event)
 			elseif (event.type == X11.ButtonPress) then
 				local event = {
 						kind = "buttonpress",
@@ -201,8 +196,7 @@ function X11Interactor.run(self)
 						y = event.xmotion.y,
 						button = event.xbutton.button,
 						}
-				signalAll("buttonpress")
-				--self.InputTracker(event)
+				signalAll("buttonpress", event)
 			elseif (event.type == X11.ButtonRelease) then
 				local event = {
 						kind = "buttonrelease",
@@ -210,15 +204,15 @@ function X11Interactor.run(self)
 						y = event.xmotion.y,
 						button = event.xbutton.button,
 						}
-				signalAll("buttonrelease")
-				--self.InputTracker(event)
+				signalAll("buttonrelease", event)
 			end
 		end
 		
 		-- blit our pixmap to the window
 		self:redraw();
 
-		-- we MUST run in a cooperative environment
+		-- we MUST yield, or nothing else will get a chance
+		-- to run
 		yield();
 	end
 end

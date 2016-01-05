@@ -9,7 +9,6 @@ local band = bit.band
 
 local kernel = require("kernel")
 local X11Interactor = require("X11Interactor")
-local DrawingContext = require("DrawingContext")
 
 
 -- some global variables
@@ -56,6 +55,7 @@ end
 local function onMouseMove(activity)
 		mouseX = activity.x;
 		mouseY = activity.y;
+
 		if isMouseDragging then
 			if mouseDragged then
 				mouseDragged()
@@ -88,17 +88,21 @@ local function onButtonRelease(activity)
 		end
 end
 
+local function onLoop(activity)
+	if loop then
+		loop()
+	end
+end
 
-local driver = X11Interactor({Title="GuiApp"})
+local driver = X11Interactor()
 
 function size(awidth, aheight)
 	width = awidth;
 	height = aheight;
 
-	local data = driver:size(awidth, aheight)
-	local dc = DrawingContext(awidth, aheight, data)
+	local graphPort = driver:graphPort(awidth, aheight)
 
-	return dc;
+	return graphPort;
 end
 
 local exports = {
@@ -107,9 +111,10 @@ local exports = {
 
 on("keypress", onKeyPress)
 on("keyrelease", onKeyRelease)
-on("mousepress", onMousePress)
-on("mouserelease", onMouseRelease)
+on("buttonpress", onButtonPress)
+on("buttonrelease", onButtonRelease)
 on("mousemove", onMouseMove)
+on("loop", onLoop)
 
 spawn(driver.run, driver)
 
