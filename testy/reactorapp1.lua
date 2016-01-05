@@ -1,20 +1,23 @@
 #!/usr/bin/env luajit
 
---guiapp2.lua
 package.path = package.path..";../?.lua"
 
 
 --[[
-	Test using the GuiApp concept, whereby the interactor
-	is a pluggable component.
+	Test using the GuiReactor concept, whereby the interactor
+	is a pluggable component, which generates events.
 --]]
 local gap = require("GuiReactor")
 local colors = require("colors")
+local bmp = require("bmpcodec")
+local FileStream = require("filestream")
+
 
 local awidth = 640;
 local aheight = 480;
 
 local graphPort = nil;
+local graphParams = nil;
 
 
 --[[
@@ -24,8 +27,14 @@ local graphPort = nil;
 	It is ok to not implement them as well, if your
 	application doesn't require any mouse activity.
 --]]
+
+-- On MouseDown, write out the image to a .bmp file
 function mousePressed()
 	print("mousePressed(): ", mouseButton)
+	-- generate a .bmp file
+	local fs = FileStream.open("reactorapp1.bmp")
+	bmp.write(fs, graphParams)
+	fs:close();
 end
 
 function mouseReleased()
@@ -37,7 +46,7 @@ function mouseDragged()
 end
 
 function mouseMoved()
-	print("mouse move: ", mouseX, mouseY)
+	--print("mouse move: ", mouseX, mouseY)
 end
 
 --[[
@@ -65,8 +74,9 @@ end
 -- you MUST at least call gap.size(), or no window
 -- will be created.
 function setup()
-	print("setup")
-	graphPort = size(awidth,aheight)
+	print("setup");
+	graphPort = size(awidth,aheight);
+	graphParams = bmp.setup(awidth, aheight, 32, graphPort.data);
 end
 
 function loop()

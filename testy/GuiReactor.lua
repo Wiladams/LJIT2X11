@@ -53,18 +53,18 @@ local function onKeyRelease(activity)
 end
 
 local function onMouseMove(activity)
-		mouseX = activity.x;
-		mouseY = activity.y;
+	mouseX = activity.x;
+	mouseY = activity.y;
 
-		if isMouseDragging then
-			if mouseDragged then
-				mouseDragged()
-			end
-		else
-			if mouseMoved then
-				mouseMoved()
-			end
+	if isMouseDragging then
+		if mouseDragged then
+			mouseDragged()
 		end
+	else
+		if mouseMoved then
+			mouseMoved()
+		end
+	end
 end
 
 local function onButtonPress(activity)
@@ -78,7 +78,7 @@ local function onButtonPress(activity)
 end
 
 local function onButtonRelease(activity)
-			isMouseDragging = false;
+		isMouseDragging = false;
 		mouseButton = activity.button;
 		mouseX = activity.x;
 		mouseY = activity.y;
