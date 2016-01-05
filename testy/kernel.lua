@@ -465,7 +465,7 @@ end
 local function onSignalContinue(eventName, func)
 	local function closure()
 		while true do
-			print("onSignalContinue.waitForSignal: ", waitForSignal(eventName))
+			func(waitForSignal(eventName))
 		end
 	end
 
